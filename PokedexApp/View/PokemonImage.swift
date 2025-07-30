@@ -1,15 +1,9 @@
-//
-//  PokemonImage.swift
-//  PokedexApp
-//
-//  Created by Eric on 29/07/25.
-//
-
 import SwiftUI
 
 struct PokemonImage: View {
     var pokemonId: Int
     var size: CGFloat = 75
+
     @State var pokemonSprite: String = ""
 
     var body: some View {
@@ -19,6 +13,7 @@ struct PokemonImage: View {
                 image
                     .resizable()
                     .scaledToFit()
+                    .saturation(0.0)
             case .failure(_):
                 ProgressView()
             default:

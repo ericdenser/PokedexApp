@@ -14,38 +14,57 @@ struct PokemonDetalhes: View {
     var body: some View {
         VStack {
             if let pokemon = pokemon {
-                VStack(spacing: 16) {
-                    Text(pokemon.name.capitalized)
-                        .font(.largeTitle)
-                        .bold()
+                ZStack(alignment: .topTrailing) {
+                    VStack(spacing: 16) {
+                        // Tipos do Pokémon em cima da imagem
+                        HStack {
+                            ForEach(pokemon.types, id: \.slot) { entry in
+                                Text(entry.type.name.capitalized)
+                                    .font(.subheadline)
+                                    .padding(6)
+                                    .background(.orange.opacity(0.2))
+                                    .cornerRadius(8)
+                            }
+                        }
 
-                    PokemonImage(pokemonId: pokemon.id, size: 180)
+                        // Imagem e nome
+                        PokemonImage(pokemonId: pokemon.id, size: 180)
+                        Text(pokemon.name.capitalized)
+                            .font(.title)
+                            .bold()
 
-                    Text("Altura: \(Double(pokemon.height) / 10, specifier: "%.1f") m")
-                    Text("Peso: \(Double(pokemon.weight) / 10, specifier: "%.1f") kg")
+                        Divider()
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Altura: \(Double(pokemon.height) / 10, specifier: "%.1f") m")
+                            Text("Peso: \(Double(pokemon.weight) / 10, specifier: "%.1f") kg")
+                            Text("Habilidades:")
+                                .font(.headline)
+                            ForEach(pokemon.abilities, id: \.ability.name) { ability in
+                                Text("• \(ability.ability.name.capitalized)")
+                            }
+                        }
+
+                        Spacer()
+                    }
+
+                    // Pokébola para desbloquear
+//                    Button(action: {
+//                        isUnlocked.toggle()
+//                        saveUnlockedStatus()
+//                    }) {
+//                        Image("Pokebola")
+//                            .resizable()
+//                            .frame(width: 32, height: 32)
+//                            .padding(12)
+//                    }
                 }
                 .padding()
-                HStack {
-                    ForEach(pokemon.types, id: \.slot) { entry in
-                        Text(entry.type.name.capitalized)
-                            .padding(6)
-                            .background(.orange.opacity(0.2))
-                            .cornerRadius(8)
-                    }
-                }
-
-                VStack(alignment: .leading) {
-                    Text("Habilidades:")
-                        .font(.headline)
-
-                    ForEach(pokemon.abilities, id: \.ability.name) { ability in
-                        Text("• \(ability.ability.name.capitalized)")
-                    }
-                }
             }
         }
         .task {
             await fetchPokemon()
+//            loadUnlockedStatus()
         }
     }
 
@@ -54,15 +73,28 @@ struct PokemonDetalhes: View {
             print ("URL inválida")
             return
         }
-
+        
+        
+        
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
             let decoded = try JSONDecoder().decode(PokemonModel.self, from: data)
             pokemon = decoded
+            
+            UserDefaults.standard.set(data, forKey: "pokemon_\(pokemonId)")
+            
         } catch {
             print ("Erro: \(error.localizedDescription)")
         }
-
     }
+
+//    func saveUnlockedStatus() {
+//        UserDefaults.standard.set(isUnlocked, forKey: "unlocked_\(pokemonId)")
+//    }
+//
+//    func loadUnlockedStatus() {
+//        isUnlocked = UserDefaults.standard.bool(forKey: "unlocked_\(pokemonId)")
+//    }
 }
+
 

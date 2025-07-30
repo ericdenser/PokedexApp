@@ -9,13 +9,26 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        ExibirPokedex()
+        TabView {
+            ExibirPokedex()
+                .tabItem {
+                    Label("Pokédex", systemImage: "list.dash")
+            }
+
+            ExibirEstatisticas()
+                .tabItem {
+                    Label("Estatísticas", systemImage: "chart.bar.xaxis")
+            }
+
+            ExibirPerfil()
+                .tabItem {
+                    Label("Perfil", systemImage: "person.crop.circle")
+            }
+        }
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
+#Preview {
+    ContentView()
 }
 
