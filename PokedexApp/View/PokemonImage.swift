@@ -1,3 +1,10 @@
+//
+//  PokemonImage.swift
+//  PokedexApp
+//
+//  Created by Eric on 29/07/25.
+//
+
 import SwiftUI
 
 struct PokemonImage: View {
@@ -5,6 +12,7 @@ struct PokemonImage: View {
     var size: CGFloat = 75
 
     @State var pokemonSprite: String = ""
+    @State var isCaptured: Bool = false
 
     var body: some View {
         AsyncImage(url: URL(string: pokemonSprite)) { phase in
@@ -13,7 +21,7 @@ struct PokemonImage: View {
                 image
                     .resizable()
                     .scaledToFit()
-                    .saturation(0.0)
+                    .saturation(isCaptured ? 1.0 : 0.0)
             case .failure(_):
                 ProgressView()
             default:
@@ -23,7 +31,20 @@ struct PokemonImage: View {
         .frame(width: size, height: size)
         .clipShape(Circle())
         .onAppear {
+            // a imagem aparece, busca o sprite e verifica o status
             loadSprite()
+            verificarCapturado()
+        }
+    }
+    
+
+    func verificarCapturado() {
+        let listaCapturados = UserDefaults.standard.array(forKey: "pokemons_capturados") as? [Int] ?? []
+        
+        if listaCapturados.contains(pokemonId) {
+            self.isCaptured = true
+        } else {
+            self.isCaptured = false
         }
     }
 
@@ -35,8 +56,8 @@ struct PokemonImage: View {
             Task {
                 if let url = URL(string: "https://pokeapi.co/api/v2/pokemon/\(pokemonId)"),
                    let (data, _) = try? await URLSession.shared.data(from: url),
-                   let decoded = try? JSONDecoder().decode(PokemonModel.self, from: data),
-                   let spriteURL = decoded.sprites.front_default {
+                   let decodificado = try? JSONDecoder().decode(PokemonModel.self, from: data),
+                   let spriteURL = decodificado.sprites.front_default {
                     
                     UserDefaults.standard.set(spriteURL, forKey: key)
                     self.pokemonSprite = spriteURL

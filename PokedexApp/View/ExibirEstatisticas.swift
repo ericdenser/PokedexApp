@@ -2,44 +2,67 @@
 //  ExibirEstatisticas.swift
 //  APPPOKEDEX
 //
-//  Created by Aluno Mack on 30/07/25.
+//  Created by Eric on 30/07/25.
 //
 
 import SwiftUI
 
 struct ExibirEstatisticas: View {
-    @State private var tipoContagem: [String: Int] = [:]
+    @State var tipos: [NamedAPIResource] = []
+    @State var totalCapturados: Int = 0
 
     var body: some View {
         NavigationStack {
-            List(tipoContagem.sorted(by: { $0.value > $1.value }), id: \.key) { tipo, quantidade in
-                HStack {
-                    Text(tipo.capitalized)
-                    Spacer()
-                    Text("\(quantidade)")
-                        .foregroundColor(.gray)
+            List {
+                Section {
+                    HStack {
+                        Text("Total Capturado")
+                            .font(.headline)
+                        Spacer()
+                        Text("\(totalCapturados)/1302")
+                            .font(.headline)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                Section(header: Text("Tipos")) {
+                    ForEach(tipos, id: \.name) { tipo in
+                        NavigationLink(destination: PokemonsPorTipo(tipo: tipo)) {
+                            Label(
+                                title: { Text(tipo.name.capitalized).fontWeight(.bold) },
+                                icon: {
+                                    Image(systemName: "circle.fill")
+                                        .foregroundColor(Color.forType(tipo.name))
+                                }
+                            )
+                        }
+                        .listRowBackground(Color.forType(tipo.name).opacity(0.2))
+                    }
                 }
             }
-            .navigationTitle("Estatísticas")
-            .onAppear {
-                carregarTipos()
+            .task {
+                await fetchTipos()
+                carregarCapturados()
             }
         }
     }
+    
+    func carregarCapturados() {
+        let idCapturados = UserDefaults.standard.array(forKey: "pokemons_capturados") as? [Int] ?? []
+        self.totalCapturados = idCapturados.count
+    }
 
-    func carregarTipos() {
-        var tipos: [String: Int] = [:]
-
-        for id in 1...1302 {
-            if let data = UserDefaults.standard.data(forKey: "pokemon_\(id)"),
-               let pokemon = try? JSONDecoder().decode(PokemonModel.self, from: data) {
-                for tipo in pokemon.types {
-                    tipos[tipo.type.name, default: 0] += 1
-                }
-            }
+    func fetchTipos() async {
+        guard let url = URL(string: "https://pokeapi.co/api/v2/type") else {
+            print("URL de tipos inválida")
+            return
         }
 
-        self.tipoContagem = tipos
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            let decodificado = try JSONDecoder().decode(TypeListResponse.self, from: data)
+            self.tipos = decodificado.results
+        } catch {
+            print("Erro ao buscar os tipos: \(error.localizedDescription)")
+        }
     }
 }
-

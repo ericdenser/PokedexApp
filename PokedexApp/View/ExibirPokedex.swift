@@ -11,8 +11,8 @@ struct ExibirPokedex: View {
         }
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
-            let decoded = try JSONDecoder().decode(PokemonListResponse.self, from: data)
-            pokemons = decoded.results
+            let decodificado = try JSONDecoder().decode(PokemonListResponse.self, from: data)
+            pokemons = decodificado.results
         } catch {
             print("Erro: \(error.localizedDescription)")
         }
@@ -34,11 +34,12 @@ struct ExibirPokedex: View {
                          .textFieldStyle(RoundedBorderTextFieldStyle())
                          .frame(maxWidth: 200)
                 }
-                .padding([.horizontal, .top])
+                .padding(.horizontal)
+                .padding(.top)
 
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(filteredPokemons) { pokemon in
+                        ForEach(pokemonsFiltrados) { pokemon in
                             NavigationLink(destination: PokemonDetalhes(pokemonId: pokemon.id)) {
                                 VStack {
                                     PokemonImage(pokemonId: pokemon.id, size: 75)
@@ -52,6 +53,7 @@ struct ExibirPokedex: View {
                                         .bold()
                                         .foregroundStyle(.primary)
                                 }
+                                .frame(height: 120)
                                 .padding(8)
                                 .background(Color(.systemGray6))
                                 .cornerRadius(8)
@@ -68,7 +70,7 @@ struct ExibirPokedex: View {
         }
     }
 
-    var filteredPokemons: [PokemonListItem] {
+    var pokemonsFiltrados: [PokemonListItem] {
         if input.isEmpty {
             return pokemons
         } else {
@@ -79,6 +81,3 @@ struct ExibirPokedex: View {
     }
 }
 
-#Preview {
-    ContentView()
-}
