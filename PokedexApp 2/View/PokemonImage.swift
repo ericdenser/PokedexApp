@@ -12,7 +12,7 @@ struct PokemonImage: View {
     var size: CGFloat = 75
 
     @State var pokemonSprite: String = ""
-    @State var isCaptured: Bool = false
+    @State var foiCapturado: Bool = false
 
     var body: some View {
         AsyncImage(url: URL(string: pokemonSprite)) { phase in
@@ -21,7 +21,7 @@ struct PokemonImage: View {
                 image
                     .resizable()
                     .scaledToFit()
-                    .saturation(isCaptured ? 1.0 : 0.0)
+                    .saturation(foiCapturado ? 1.0 : 0.0)
             case .failure(_):
                 ProgressView()
             default:
@@ -32,7 +32,7 @@ struct PokemonImage: View {
         .clipShape(Circle())
         .onAppear {
             // a imagem aparece, busca o sprite e verifica o status
-            loadSprite()
+            carregarSprite()
             verificarCapturado()
         }
     }
@@ -42,13 +42,13 @@ struct PokemonImage: View {
         let listaCapturados = UserDefaults.standard.array(forKey: "pokemons_capturados") as? [Int] ?? []
         
         if listaCapturados.contains(pokemonId) {
-            self.isCaptured = true
+            self.foiCapturado = true
         } else {
-            self.isCaptured = false
+            self.foiCapturado = false
         }
     }
 
-    func loadSprite() {
+    func carregarSprite() {
         let key = "sprite_url_\(pokemonId)"
         if let cachedURL = UserDefaults.standard.string(forKey: key) {
             self.pokemonSprite = cachedURL

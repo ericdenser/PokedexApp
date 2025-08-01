@@ -1,8 +1,15 @@
+//
+//  ExibirPokedex.swift
+//  PokedexApp
+//
+//  Created by Aluno Mack on 29/07/25.
+//
 import SwiftUI
 
 struct ExibirPokedex: View {
-    @State var pokemons: [PokemonListItem] = []
     @State var input: String = ""
+    
+    @State var pokemons: [PokemonListItem] = []
 
     func fetchPokemons() async {
         guard let url = URL(string: "https://pokeapi.co/api/v2/pokemon?limit=1302") else {
@@ -24,15 +31,21 @@ struct ExibirPokedex: View {
         NavigationStack {
             VStack {
                 HStack {
-                    Text("Pokédex")
+                    Text("Pkédex")
                         .font(.largeTitle)
                         .bold()
 
                     Spacer()
 
                     TextField("Buscar...", text: $input)
-                         .textFieldStyle(RoundedBorderTextFieldStyle())
+                         .fontWeight(.bold)
+                         .padding(8)
                          .frame(maxWidth: 200)
+                         .overlay(
+                                 RoundedRectangle(cornerRadius: 8)
+                                     .stroke(Color.black, lineWidth: 1) 
+                             )
+                         .autocorrectionDisabled(true)
                 }
                 .padding(.horizontal)
                 .padding(.top)
@@ -53,7 +66,7 @@ struct ExibirPokedex: View {
                                         .bold()
                                         .foregroundStyle(.primary)
                                 }
-                                .frame(height: 120)
+                                .frame(maxHeight: 120)
                                 .padding(8)
                                 .background(Color(.systemGray6))
                                 .cornerRadius(8)

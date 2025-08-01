@@ -1,12 +1,4 @@
 //
-//  PokemonListItem.swift
-//  PokedexApp
-//
-//  Created by Eric on 30/07/25.
-//
-
-
-//
 //  Pokemon.swift
 //  PokedexApp
 //
@@ -23,8 +15,8 @@ struct PokemonModel: Codable, Identifiable {
     let sprites: PokemonSprites
     let types: [PokemonTypeEntry]
     let abilities: [PokemonAbilityEntry]
-    let stats: [PokemonStat]
-    let base_experience: Int? //indicador de raridade
+    let stats: [PokemonStat] // somatoria dos elementos da lista usado como indicador de forca
+    let base_experience: Int? // usado como indicador de raridade
 }
 
 // sprites (imagem)

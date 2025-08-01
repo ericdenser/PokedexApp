@@ -14,7 +14,7 @@ struct PokemonsPorTipo: View {
     
     let columns = [GridItem(.adaptive(minimum: 80))]
     
-    // Calcula mais forte baseado na soma dos stats base
+    // procura o mais forte baseado na soma dos stats base
     var pokemonMaisForte: PokemonModel? {
         pokemonsCapturados.max { p1, p2 in
             let sum1 = p1.stats.reduce(0) { somaParcial, itemAtual in
@@ -27,7 +27,7 @@ struct PokemonsPorTipo: View {
         }
     }
     
-    // Calcula o mais "raro" baseado na experiência base
+    // acha o mais "raro" baseado na experiência base
     var pokemonMaisRaro: PokemonModel? {
         pokemonsCapturados.max { pokemon1, pokemon2 in
             let xp1 = pokemon1.base_experience ?? 0
@@ -102,6 +102,7 @@ struct PokemonsPorTipo: View {
                                 .background(Color(.systemGray6))
                                 .cornerRadius(8)
                                 .shadow(radius: 2)
+                                .frame(maxHeight: 120)
                             }
                         }
                     }
@@ -136,7 +137,7 @@ struct PokemonsPorTipo: View {
                 if let pokemonData = UserDefaults.standard.data(forKey: "pokemon_\(id)"),
                    let pokemonModel = try? JSONDecoder().decode(PokemonModel.self, from: pokemonData) {
                     
-                    // verificar se pertence a este tipo
+                    // verifica se pertence a este tipo
                     let temTipo = pokemonModel.types.contains { entry in
                         return entry.type.name == self.tipo.name
                     }
@@ -145,13 +146,14 @@ struct PokemonsPorTipo: View {
                     }
                 }
             }
-
+            
+            // ordena por id
             self.pokemonsCapturados = listaCapturados.sorted { p1, p2 in
                 return p1.id < p2.id
             }
 
         } catch {
-            print("Erro ao buscar dados do tipo \(tipo.name): \(error.localizedDescription)")
+            print("Erro ao buscar dados do tipo \(tipo.name)")
         }
     }
 }
